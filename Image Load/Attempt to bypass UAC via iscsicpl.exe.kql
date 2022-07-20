@@ -1,0 +1,27 @@
+// KQL
+// Generated with Uncoder.io from nasbench's sigma rule: https://github.com/SigmaHQ/sigma/blob/fd30a061125ac15966dbc8fe3c5bede88fae47bb/rules/windows/image_load/image_load_uac_bypass_iscsicpl.yml
+DeviceImageLoadEvents 
+| where (InitiatingProcessFolderPath =~ @"C:\Windows\SysWOW64\iscsicpl.exe" and not (FolderPath contains @"C:\Windows\" and FolderPath contains "iscsiexe.dll"))
+
+// Title: Attempted UAC Bypass via iscsicpl.exe
+// Privilege Escalation - T1584 - Abuse Elevation Control Mechanism (.002 - Bypass User Account Control)
+// Could also be Defense Evasion
+
+// Query Frequency and Query Lookback - run hourly. For faster searches, use an NRT detection.
+PT1H, PT1H
+
+// Entity Mapping
+Account
+Name:InitiatingProcessAccountName
+
+Process
+CommandLine:InitiatingProcessCommandLine
+
+File
+Name:FileName
+Directory:FolderPath
+
+// Custom Details
+// Lets us know if the process was executed with admin privileges
+ElevationStatus:InitiatingProcessTokenElevation
+
