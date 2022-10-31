@@ -1,0 +1,4 @@
+DeviceProcessEvents
+| where ProcessCommandLine has_all ('certutil', 'split') or InitiatingProcessCommandLine has_all ('certutil', 'split')
+| where ProcessCommandLine has_any ('verifyctl', 'urlcache') or InitiatingProcessCommandLine has_any ('verifyctl', 'urlcache')
+| project-reorder TimeGenerated, ActionType, FileName, FolderPath, ProcessCommandLine, InitiatingProcessCommandLine

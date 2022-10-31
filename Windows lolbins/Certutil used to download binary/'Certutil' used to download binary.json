@@ -1,0 +1,111 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0de97292-643c-4c95-b6cf-821bc195d807')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0de97292-643c-4c95-b6cf-821bc195d807')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "NRT",
+            "apiVersion": "2022-09-01-preview",
+            "properties": {
+                "displayName": "'Certutil' used to download binary",
+                "description": "Detects instances where the built-in 'Certutil' tool is used to download a binary from a remote location. Commonly used by threat actors to transfer tooling onto a compromised machine.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "DeviceProcessEvents\r\n| where ProcessCommandLine has_all ('certutil', 'split') or InitiatingProcessCommandLine has_all ('certutil', 'split')\r\n| where ProcessCommandLine has_any ('verifyctl', 'urlcache') or InitiatingProcessCommandLine has_any ('verifyctl', 'urlcache')\r\n| project-reorder TimeGenerated, ActionType, FileName, FolderPath, ProcessCommandLine, InitiatingProcessCommandLine",
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [
+                    "CommandAndControl"
+                ],
+                "techniques": [
+                    "T1105"
+                ],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT8H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "DeviceName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Name",
+                                "columnName": "InitiatingProcessAccountName"
+                            },
+                            {
+                                "identifier": "ObjectGuid",
+                                "columnName": "InitiatingProcessAccountObjectId"
+                            },
+                            {
+                                "identifier": "Sid",
+                                "columnName": "InitiatingProcessAccountSid"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ProcessId"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "ProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "InitiatingProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "InitiatingProcessId"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "InitiatingProcessTokenElevation"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null
+            }
+        }
+    ]
+}
