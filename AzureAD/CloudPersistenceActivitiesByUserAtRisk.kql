@@ -1,0 +1,21 @@
+// Operationalising this hunting query: https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules/blob/main/Azure%20Active%20Directory/CloudPersistenceActivityByUserAtRisk.md
+// Slightly modified list
+let PersistenceEvents = dynamic(["add member", "add device", "register device", "add service principal", "update service principal", "add user", "enable account", "add group", "Invite external user", "Add application", "add app","Consent to application", "Authentication Methods Policy Update", "Authentication Methods Policy Update","Add member to role outside of PIM (permanent)", "Add conditional access policy"]);
+let RiskyUsers = AADRiskyUsers
+     | where TimeGenerated > ago(14d)
+     | summarize arg_max(TimeGenerated, *) by Id
+     // Only looking at currently risky users - not all users that have been risky at some stage
+     | where RiskState in~ ('atRisk', 'confirmedCompromised')
+     | distinct UserDisplayName;
+AuditLogs
+| where TimeGenerated > ago(1h)
+// Filter only on the RiskyUsers from the above search
+| where Identity in~ (RiskyUsers)
+// Filter on DiscoveryEvents list
+| where OperationName has_any (PersistenceEvents)
+// join IdentityInfo
+| join kind=leftouter ( IdentityInfo
+    | where TimeGenerated > ago(14d)
+    | summarize arg_max(TimeGenerated, *) by AccountObjectId
+) on $left.Identity == $right.AccountDisplayName
+| project TimeGenerated, Identity, OperationName, Category, ResultDescription, Result, AccountUPN, AccountObjectId, AssignedRoles
