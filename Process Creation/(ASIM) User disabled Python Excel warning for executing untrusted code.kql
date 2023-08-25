@@ -4,5 +4,5 @@ imProcess
 | where TimeGenerated > ago(1h)
 | where TargetProcessName endswith "reg.exe" or TargetProcessName endswith "powershell.exe"
 | where CommandLine has_all("software\\policies\\microsoft\\office\\", "\\excel\\security", "pythonfunctionwarnings*0")
-| where CommandLine has_all ("reg", "add") and CommandLine contains 'Set-ItemProperty'
+| where CommandLine has_all ("reg", "add") or CommandLine contains 'Set-ItemProperty'
 | project-reorder TargetProcessName, CommandLine, ActingProcessName
