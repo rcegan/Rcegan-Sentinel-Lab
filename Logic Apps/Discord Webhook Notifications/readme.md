@@ -14,6 +14,7 @@ Things I want to add:
 * Dynamically change the link to the workspace based on alert provider (e.g. link to Defender if the alert came from Defender)
 * Parse entities nicely and add to the description of the notification
 * Shorten the URL to the Sentinel incident
+* Account for incidents with multiple alerts so it doesn't multiple notifications for the same incident
 
 ![](DiscordWebhookLogicApp.png)
 
