@@ -10,4 +10,22 @@ You may wish to modify:
 * Change the time zone step to convert to your timezone
 * The icon URL. I'm using a random Sentinel logo I found on Google.
 
+Things I want to add:
+* Dynamically change the link to the workspace based on alert provider (e.g. link to Defender if the alert came from Defender)
+* Parse entities nicely and add to the description of the notification
+* Shorten the URL to the Sentinel incident
+
 ![](DiscordWebhookLogicApp.png)
+
+## Logic App Breakdown
+First we set some variables:
+![](SettingVariables.png)
+
+Convert the timezone:
+![](ConvertTime.png)
+
+Set our Variables (not pictured is the P4 step):
+![](ChangeVariables.png)
+
+Send the POST:
+![](SendingRequest.png)
